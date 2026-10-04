@@ -1,0 +1,31 @@
+import os
+import numpy as np
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow.keras.models import load_model
+
+# Define the image size your model expects (adjust this as needed)
+IMG_SIZE = (128, 128)
+
+# Load the trained model
+model = load_model('/content/drive/MyDrive/btd/brain_tumor_model.h5')  # Replace with your actual model file path
+
+def predict_images(folder_path):
+    # Iterate over the images in the specified folder
+    for file in os.listdir(folder_path):
+        # Check if the file is an image (optional, can be adjusted)
+        if file.endswith(('.png', '.jpg', '.jpeg')):
+            img_path = os.path.join(folder_path, file)
+            # Load and resize the image
+            img = load_img(img_path, target_size=IMG_SIZE)
+            img_array = img_to_array(img) / 255.0  # Normalize the image
+            img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+
+            # Make the prediction
+            prediction = model.predict(img_array)
+            label = "Tumor" if prediction[0][0] > 0.5 else "Non-Tumor"
+
+            # Print the result for each image
+            print(f"Image: {file}, Prediction: {label}")
+
+# Replace 'path_to_your_images_folder' with the actual folder path where your images are stored
+predict_images('/content/drive/MyDrive/pred2')
